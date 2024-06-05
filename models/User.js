@@ -70,5 +70,21 @@ class User {
       throw error;
     }
   }
+
+  static async updateOneById(_id, { displayName, profilePicUrl }) {
+    try {
+      const collection = await User.collection();
+
+      return await collection.updateOne(
+        { _id: new ObjectId(_id) },
+        {
+          displayName,
+          profilePicUrl,
+        }
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 module.exports = User;

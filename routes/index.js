@@ -1,5 +1,6 @@
 const AuthRouter = require("./AuthRouter");
-const path = require("path");
+const UploadsRouter = require("./UploadsRouter");
+const UsersRouter = require("./UsersRouter");
 
 const router = require("express").Router();
 
@@ -7,16 +8,10 @@ router.get("/", (req, res) => {
   res.send("Running..");
 });
 
-// Define a route to serve uploaded files
-router.get("/uploads/:filename", (req, res) => {
-  const fileName = req.params.filename;
-  const filePath = path.join(__dirname, "../public/uploads", fileName);
-
-  // Serve the file using sendFile
-  res.sendFile(filePath);
-});
-
+router.use("/uploads", UploadsRouter);
 router.use("/auth", AuthRouter);
+router.use("/users", UsersRouter);
+
 // router.use("/profile", ProfileRouter);
 
 module.exports = router;

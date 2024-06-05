@@ -1,17 +1,35 @@
+const { isStringValid } = require("../helpers/bcrypt");
 const { CustomError } = require("../middlewares/ErrorHandler");
 const User = require("../models/User");
 
 class UserController {
-  static async register(req, res, next) {
+  static async update(req, res, next) {
     try {
-      const { teamName, schoolName, memberCount, members } = req.body;
-      if (!teamName || !schoolName || !memberCount || !members) {
-        throw new CustomError(400, "Invalid POST Request field");
-      }
+      const { displayName, profilePicUrl } = req.body;
+      const { nim } = req.params;
+      const microsoftId = res.locals.user?.microsoftId;
 
-      await User.register({ teamName, schoolName, memberCount, members: JSON.parse(members) });
+      const existingUser = await User.findOne({ nim });
+      if (!existingUser) throw new CustomError(404, "User Not Found");
 
-      res.status(201).json("success");
+      if (!isStringValid(microsoftId, existingUser.microsoftId)) throw new CustomError(403, "Unauthorized");
+
+      await User.updateOneById(existingUser._id, { displayName, profilePicUrl });
+
+      res.status(200).json("Updated");
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getOneByNim(req, res, next) {
+    try {
+      const { nim } = req.params;
+
+      const user = await User.findOne({ nim });
+      if (!user) throw new CustomError(404, "User Not Found");
+
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
