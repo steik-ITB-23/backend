@@ -1,5 +1,6 @@
 const { isStringValid } = require("../helpers/bcrypt");
 const { CustomError } = require("../middlewares/ErrorHandler");
+const Pilihan = require("../models/Pilihan");
 const User = require("../models/User");
 
 class UserController {
@@ -28,7 +29,8 @@ class UserController {
 
       const user = await User.findOne({ nim });
       if (!user) throw new CustomError(404, "User Not Found");
-
+      const pilihan = await Pilihan.findOne({ userid: user._id });
+      user.pilihan = pilihan;
       res.status(200).json(user);
     } catch (error) {
       next(error);
